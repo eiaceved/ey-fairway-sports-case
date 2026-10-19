@@ -1,0 +1,1097 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.home-pill{font:600 12px var(--mono,-apple-system);padding:5px 11px;border-radius:999px;color:#fff;background:var(--accent,#0d6b61);text-decoration:none;white-space:nowrap;margin-right:12px}
+</style></head><body>
+<title>Fairway Sports Mock Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: one reading column (max 820px) under a sticky step rail. Every step runs the same loop:
+   interviewer prompt -> your move -> reveal a strong answer. Exhibits sit inside the column like workpapers. */
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --surface-2:#e8eef0; --fg:#13202a; --fg-2:#44525d; --muted:#6c7a84; --line:#d4dce0;
+  --accent:#0d6b61; --accent-ink:#0a5a51; --accent-soft:#dbeeea; --on-accent:#ffffff;
+  --s1:#2a78d6; --s2:#eb6834; --grid:#e2e8ea; --axis:#b6c1c7;
+  --good:#0ca30c; --good-ink:#006300; --crit:#d03b3b; --crit-ink:#ad2828;
+  --h1:#e6f0fc; --h2:#b7d3f6; --h3:#6da7ec; --h4:#2a78d6; --h5:#104281;
+  --dot:#eb6834; --dot-ink:#111111; --tip-bg:#13202a; --tip-fg:#ffffff;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1215; --surface:#151c20; --surface-2:#1b252a; --fg:#e5ecef; --fg-2:#a8b4bb; --muted:#7c8992; --line:#29343a;
+    --accent:#4cc2b1; --accent-ink:#72d4c6; --accent-soft:#11302c; --on-accent:#06201c;
+    --s1:#3987e5; --s2:#d95926; --grid:#222c32; --axis:#3a464d;
+    --good:#0ca30c; --good-ink:#3dc43d; --crit:#d03b3b; --crit-ink:#ff8484;
+    --h1:#1a2531; --h2:#1c3c63; --h3:#22599b; --h4:#3987e5; --h5:#86b6ef;
+    --dot:#f07a45; --dot-ink:#111111; --tip-bg:#e5ecef; --tip-fg:#0d1215;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1215; --surface:#151c20; --surface-2:#1b252a; --fg:#e5ecef; --fg-2:#a8b4bb; --muted:#7c8992; --line:#29343a;
+  --accent:#4cc2b1; --accent-ink:#72d4c6; --accent-soft:#11302c; --on-accent:#06201c;
+  --s1:#3987e5; --s2:#d95926; --grid:#222c32; --axis:#3a464d;
+  --good:#0ca30c; --good-ink:#3dc43d; --crit:#d03b3b; --crit-ink:#ff8484;
+  --h1:#1a2531; --h2:#1c3c63; --h3:#22599b; --h4:#3987e5; --h5:#86b6ef;
+  --dot:#f07a45; --dot-ink:#111111; --tip-bg:#e5ecef; --tip-fg:#0d1215;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--display);font-stretch:86%;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0 0 .8em}
+a{color:var(--accent-ink)}
+b,strong{font-weight:700}
+.eyebrow,.lbl,.who{font:500 11px/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* rail */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.rail-in{max-width:820px;margin:0 auto;padding:8px 20px;display:flex;gap:10px;align-items:center}
+.chips{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding-block:2px}
+.chips::-webkit-scrollbar{display:none}
+.chips a{font:500 12px var(--mono);padding:5px 9px;border-radius:999px;color:var(--fg-2);white-space:nowrap;text-decoration:none}
+.chips a:hover{background:var(--surface-2)}
+.chips a.on{background:var(--fg);color:var(--bg)}
+.speed{display:flex;align-items:center;gap:6px;font:500 11px var(--mono);color:var(--muted);flex:none}
+.speed select{font:500 12px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 4px}
+
+/* hero */
+.hero{padding-block:56px 40px}
+.hero .eyebrow{color:var(--accent-ink);margin-bottom:14px}
+.hero h1{font-size:clamp(40px,8vw,64px);line-height:1;font-weight:800;font-stretch:80%}
+.lede{font-size:21px;line-height:1.5;color:var(--fg-2);max-width:36em;margin-top:18px}
+.how{list-style:none;padding:0;margin:26px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.how li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:15px;line-height:1.4;counter-increment:how}
+.how li::before{content:counter(how);display:block;font:600 12px var(--mono);color:var(--accent-ink);margin-bottom:4px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+
+/* steps */
+.step{padding-block:52px;border-top:1px solid var(--line);scroll-margin-top:56px}
+.sh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.idx{font:600 13px var(--mono);color:var(--accent-ink)}
+.sh h2{font-size:clamp(26px,4.4vw,32px);line-height:1.15;font-weight:750}
+.sh .listen{margin-left:auto}
+.sub{color:var(--fg-2);margin-top:8px;max-width:40em}
+
+.btn{font:600 14px/1.2 var(--body);border-radius:8px;padding:9px 14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{font-size:13px;padding:6px 10px}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn svg{width:14px;height:14px;fill:currentColor;flex:none}
+
+.iv{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-top:22px}
+.who{color:var(--muted);margin-bottom:8px}
+.iv p{font-size:19px;line-height:1.55}
+.iv p:last-child{margin-bottom:0}
+
+.move{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-block:14px;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.move .lbl{color:var(--accent-ink);flex:none}
+.move p{margin:0;flex:1 1 260px;min-width:0;font-weight:600}
+.move .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+.ans{background:var(--accent-soft);border-radius:var(--r);padding:20px 22px;margin-top:14px}
+.ans .who{color:var(--accent-ink)}
+.ans h3{font-size:19px;margin:18px 0 8px;font-weight:700}
+.ans h3:first-of-type{margin-top:4px}
+.ans ul{margin:0 0 .6em;padding-left:1.2em}
+.ans li{margin-bottom:.35em}
+.script{font-size:18px;line-height:1.6}
+.script p{margin-bottom:.7em}
+.note{font-size:15px;color:var(--fg-2)}
+
+/* facts strip */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:16px}
+.facts div{background:var(--surface);padding:12px 14px;min-width:0}
+.facts .k{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts .v{font:700 22px/1.2 var(--display);font-stretch:86%;margin-top:4px}
+.facts .d{font-size:13px;color:var(--fg-2);line-height:1.35;margin-top:2px}
+
+/* primer */
+.def{font:600 clamp(21px,3.4vw,26px)/1.35 var(--display);font-stretch:92%;margin-top:22px;max-width:30em}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
+.panel h3{font-size:19px;font-weight:700}
+.panel .tag{font:500 11px var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:2px 0 8px}
+.panel ul{margin:0;padding-left:1.1em;font-size:16px}
+.panel li{margin-bottom:.3em}
+.cycle{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.cycle li{position:relative;background:var(--surface-2);border-radius:8px;padding:12px 12px 10px;min-width:0}
+.cycle li b{display:block;font:700 17px var(--display);font-stretch:88%}
+.cycle li span{font-size:14px;color:var(--fg-2);line-height:1.35;display:block;margin-top:2px}
+.cycle li:not(:last-child)::after{content:"";position:absolute;right:-17px;top:50%;width:12px;height:12px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);transform:translateY(-50%) rotate(45deg)}
+.cycle-note{font:500 12px var(--mono);color:var(--muted);margin-top:10px}
+.vocab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.term{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.term b{display:block;font:700 16px var(--display);font-stretch:90%;margin-bottom:3px}
+.term p{margin:0;font-size:15px;line-height:1.45;color:var(--fg-2)}
+.h-sec{font:500 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:30px}
+
+/* qa list */
+.qa{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.qa li{background:var(--surface);border-radius:8px;padding:12px 14px}
+.qa .q{font-weight:700}
+.qa .a{color:var(--fg-2);margin-top:2px}
+.qa .a::before{content:"Interviewer: ";font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* framework tree */
+.tree{margin-top:6px}
+.root{background:var(--fg);color:var(--bg);border-radius:8px;padding:12px 16px;font:700 18px/1.3 var(--display);font-stretch:90%;text-align:center;position:relative}
+.root::after{content:"";position:absolute;left:50%;bottom:-16px;width:2px;height:16px;background:var(--muted)}
+.branches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px;padding-top:14px;border-top:2px solid var(--muted)}
+.branch{background:var(--surface);border-radius:8px;padding:12px 13px;min-width:0}
+.branch .n{font:600 12px var(--mono);color:var(--accent-ink)}
+.branch b{display:block;font:700 16px/1.25 var(--display);font-stretch:90%;margin:2px 0 6px}
+.branch ul{margin:0;padding-left:1.05em;font-size:14.5px;line-height:1.4}
+.branch li{margin-bottom:.3em}
+
+/* exhibits */
+.ex{margin:22px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 14px}
+.ex-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}
+.ex-t{font:700 18px var(--display);font-stretch:88%}
+.ex-ref{font:500 12px var(--mono);color:var(--muted)}
+.ex-s{font-size:14px;color:var(--fg-2);margin-top:2px}
+.ex figcaption,.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:12px}
+.multiples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.mini{border:1px solid var(--grid);border-radius:8px;padding:10px 10px 4px;min-width:0}
+.mini .nm{font-weight:700;font-size:14.5px;line-height:1.25;min-height:2.5em}
+.mini .ch{font:500 12px var(--mono);color:var(--fg-2)}
+.mini svg{display:block;width:100%;height:auto;margin-top:4px}
+.tblwrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+
+.hbar{margin-top:16px}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:4px 14px;align-items:center;padding-block:9px;border-bottom:1px solid var(--grid)}
+.hrow:last-of-type{border-bottom:0}
+.hlab b{display:block;font-size:15px;line-height:1.3}
+.hlab span{font-size:13px;color:var(--fg-2);line-height:1.3;display:block}
+.track{position:relative;height:26px}
+.bar{position:absolute;left:0;top:5px;height:16px;border-radius:0 4px 4px 0;background:var(--s1);min-width:2px}
+.bar.b2{background:var(--s2)}
+.bval{position:absolute;top:2px;font:600 13px var(--mono);color:var(--fg);white-space:nowrap;padding-left:6px}
+.tol{position:absolute;top:-4px;bottom:-4px;width:0;border-left:1.5px solid var(--fg-2)}
+.axis{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:14px}
+.ticks{position:relative;height:18px;font:500 11px var(--mono);color:var(--muted);border-top:1px solid var(--axis)}
+.ticks span{position:absolute;top:3px;transform:translateX(-50%)}
+.ticks span:first-child{transform:none}
+.ticks span:last-child{transform:translateX(-100%)}
+.status{font:600 12px var(--mono);display:inline-flex;gap:5px;align-items:center;margin-top:3px}
+.status.bad{color:var(--crit-ink)} .status.ok{color:var(--good-ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--fg-2);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tolnote{font:500 12px var(--mono);color:var(--fg-2);margin-top:8px}
+
+/* given table + calc steps */
+.given{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:16px}
+.given div{background:var(--surface);padding:11px 13px;min-width:0}
+.given .k{font-size:13px;color:var(--fg-2);line-height:1.3}
+.given .v{font:700 20px/1.2 var(--display);font-stretch:88%;margin-top:3px}
+.calc{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.calc li{background:var(--surface);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:center}
+.calc .t{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);grid-column:1/-1}
+.calc .f{font-size:16px;min-width:0}
+.calc .r{font:700 20px var(--display);font-stretch:88%;text-align:right;white-space:nowrap}
+.stepper .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chipset{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chipset span{font:500 12px var(--mono);background:var(--surface);border-radius:6px;padding:4px 8px;color:var(--fg-2)}
+.chipset b{color:var(--fg)}
+
+/* heat map */
+.heat{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start;margin-top:12px}
+.heat svg{width:100%;height:auto;display:block}
+.heat svg text{font-family:var(--mono)}
+.reg{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.reg li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14.5px;line-height:1.3;padding-block:6px;border-bottom:1px solid var(--grid)}
+.reg .id{width:28px;height:28px;border-radius:50%;background:var(--dot);color:var(--dot-ink);font:600 11px var(--mono);display:grid;place-items:center}
+.reg .sc{font:600 13px var(--mono);color:var(--fg-2);text-align:right;white-space:nowrap}
+.ramp{display:flex;align-items:center;gap:6px;font:500 11px var(--mono);color:var(--muted);margin-top:10px}
+.ramp i{width:22px;height:10px;display:inline-block;border-radius:2px}
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+.phase{background:var(--surface);border-radius:8px;padding:12px 14px;min-width:0}
+.phase .d{font:600 12px var(--mono);color:var(--accent-ink)}
+.phase b{display:block;font:700 18px var(--display);font-stretch:88%;margin:2px 0 6px}
+.phase ul{margin:0;padding-left:1.05em;font-size:15px;line-height:1.4}
+.phase li{margin-bottom:.35em}
+.struct{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.struct span{font:600 12px var(--mono);padding:4px 9px;border-radius:999px;background:var(--surface);color:var(--fg)}
+
+/* drivers */
+.drivers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.drivers div{background:var(--surface);border-radius:8px;padding:11px 13px;min-width:0}
+.drivers b{display:block;font:700 16px var(--display);font-stretch:90%}
+.drivers p{margin:2px 0 0;font-size:15px;color:var(--fg-2);line-height:1.45}
+.eq{font:600 15px var(--mono);background:var(--surface);border-radius:8px;padding:10px 14px;margin:6px 0 12px;overflow-x:auto}
+.drill{margin-top:34px}
+.drill h3{font-size:22px;font-weight:750}
+
+/* multiple choice */
+.mc{margin-top:20px}
+.mc-head{display:flex;gap:10px;align-items:flex-start}
+.stem{font-weight:700;font-size:18px;line-height:1.45;margin:0 0 10px;flex:1;min-width:0}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;line-height:1.45;cursor:pointer;width:100%}
+.opt:hover:not([disabled]){border-color:var(--muted)}
+.opt[disabled]{cursor:default}
+.opt .L{font:600 13px/1.6 var(--mono);color:var(--muted);flex:none}
+.opt .x{flex:1;min-width:0}
+.opt .tag{font:600 12px/1.7 var(--mono);white-space:nowrap;flex:none}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,var(--surface))}
+.opt.right .tag{color:var(--good-ink)}
+.opt.wrong{border-color:var(--crit);background:color-mix(in srgb,var(--crit) 9%,var(--surface))}
+.opt.wrong .tag{color:var(--crit-ink)}
+.why{margin-top:10px;padding:13px 16px;border-radius:8px;background:var(--surface-2);font-size:16px}
+.why p:last-child{margin-bottom:0}
+.test .mc{border-top:1px solid var(--line);padding-top:20px;margin-top:22px}
+.test .mc:first-of-type{border-top:0;padding-top:0}
+.qn{font:600 13px var(--mono);color:var(--accent-ink);display:block;margin-bottom:2px}
+.scorebar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:5;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--bg);padding-block:10px;margin-top:14px;border-bottom:1px solid var(--line)}
+.score{font:700 22px var(--display);font-stretch:86%}
+.score small{font:500 12px var(--mono);color:var(--muted);margin-left:6px}
+.done{background:var(--accent-soft);border-radius:var(--r);padding:16px 18px;margin-top:24px}
+
+footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;color:var(--fg-2)}
+
+#tip{position:fixed;z-index:50;pointer-events:none;background:var(--tip-bg);color:var(--tip-fg);font:500 12px/1.4 var(--mono);padding:6px 9px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+
+@media (max-width:760px){
+  .branches{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .heat{grid-template-columns:minmax(0,1fr)}
+  .road{grid-template-columns:minmax(0,1fr)}
+  .multiples{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  .how{grid-template-columns:minmax(0,1fr)}
+  .split,.vocab,.drivers{grid-template-columns:minmax(0,1fr)}
+  .cycle{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cycle li:nth-child(2)::after{display:none}
+  .given{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hrow,.axis{grid-template-columns:minmax(0,1fr)}
+  .axis>div:first-child{display:none}
+  .iv p{font-size:18px}
+  .speed span{display:none}
+}
+@media (max-width:420px){
+  .branches{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .ans:not([hidden]),.why:not([hidden]),.calc li:not([hidden]){animation:rise .28s ease-out}
+  @keyframes rise{from{transform:translateY(4px);opacity:.4}to{transform:none;opacity:1}}
+  html{scroll-behavior:smooth}
+}
+[hidden]:not([hidden=until-found i]){display:none!important}
+/* scoring register */
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+.scorer li{grid-template-columns:auto minmax(0,1fr) auto}
+.scorer .nm{min-width:0}
+.pick{display:flex;gap:6px;align-items:center}
+.pick select{font:500 13px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 4px;min-width:44px}
+.pick .sc{min-width:34px}
+.reg .w{display:block;font-size:13px;color:var(--fg-2);margin-top:2px;line-height:1.35}
+.reg .nm b{font-weight:600}
+.mytop{font:600 15px/1.4 var(--body);margin:12px 0 0;color:var(--fg)}
+.mapnote{font:500 12px var(--mono);color:var(--fg-2);margin:8px 0 0}
+.bar.b3{background:var(--fg-2)}
+@media (max-width:600px){.given>div:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:420px){
+  .scorer li{grid-template-columns:auto minmax(0,1fr)}
+  .scorer .pick{grid-column:2}
+}
+</style>
+
+<nav class="rail" aria-label="Case steps">
+  <div class="rail-in">
+    <a class="home-pill" href="/">All cases</a>
+    
+    <div class="chips" id="chips">
+      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Framework</a><a href="#ex1">Exhibit 1</a><a href="#ex2">Exhibit 2</a><a href="#sizing">Club math</a><a href="#prioritize">Options</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a>
+    </div>
+    <label class="speed" for="rate"><span>Speed</span>
+      <select id="rate" aria-label="Read-aloud speed">
+        <option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option><option value="1.3">1.3×</option>
+      </select>
+    </label>
+  </div>
+</nav>
+
+<main>
+<header class="hero wrap">
+  <p class="eyebrow">Mock case · EY-Parthenon-style · growth strategy · candidate-led · about 40 minutes</p>
+  <h1>Fairway Sports</h1>
+  <p class="lede" data-say>A sporting goods chain has big stores with empty space, and pickleball has taken off. Should it turn that space into indoor pickleball clubs? You lead the case, with plenty of market sizing along the way.</p>
+  <ol class="how">
+    <li><b>Listen or read</b> the interviewer's prompt. Every step has a Listen button.</li>
+    <li><b>Answer out loud</b> before you reveal anything. Use the timers.</li>
+    <li><b>Compare</b> with the strong answer, then move to the next step.</li>
+  </ol>
+  <div class="hero-actions">
+    <a class="btn primary" href="#prompt">Start the case</a>
+    <a class="btn" href="#primer">2-minute primer first</a>
+    <a class="btn" href="#test">Jump to the practice test</a>
+  </div>
+  </header>
+
+<div class="wrap">
+
+<!-- 01 PRIMER -->
+<section class="step" id="primer">
+  <div class="sh"><span class="idx">01</span><h2>How an EY-Parthenon-style growth case works</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="def" data-say>Growth cases ask whether a company should move into something new: a market, a product, or a business model. In an EY-Parthenon-style case you lead: size the market, test the economics, and make the call.</p>
+  <p class="sub" data-say>Put simply, they want structured thinking, comfortable market sizing, and a clear decision. "Go, but start small, here" beats "it depends." Formats vary by office, so confirm the details with your recruiter.</p>
+
+  <div class="split">
+    <div class="panel">
+      <h3>How the interview runs</h3>
+      <p class="tag">Based on public prep guides</p>
+      <ul data-say>
+        <li>Usually an online numbers test first, sometimes with a recorded video interview.</li>
+        <li>First round: one or two interviews of 45 to 60 minutes, each mixing fit questions with a candidate-led case.</li>
+        <li>Final round: two or three interviews with senior leaders. Some offices add a group case or a written case you present in a few slides.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>What makes a growth case different</h3>
+      <p class="tag">Four habits</p>
+      <ul data-say>
+        <li>Size the market before anything else.</li>
+        <li>Check who else is moving in: a hot market can get crowded fast.</li>
+        <li>Prove the economics of one unit before rolling out fifty.</li>
+        <li>Ask why this company should win, not just whether the market is attractive.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="h-sec">What the case feels like</p>
+  <ul data-say style="margin:8px 0 0;padding-left:1.2em">
+    <li><b>Market.</b> How many customers, and how fast is it growing?</li>
+    <li><b>Competition.</b> How many rivals, and what's happening to their prices and how full they are?</li>
+    <li><b>Economics.</b> What does one location earn, and how long until it pays back?</li>
+    <li><b>Right to win.</b> What does this company have that rivals don't?</li>
+    <li><b>Decision.</b> Go, no-go, or start small, and exactly how.</li>
+  </ul>
+
+  <p class="h-sec">A useful order for any market entry case</p>
+  <ol class="cycle" data-say aria-label="Market, competition, economics, right to win">
+    <li><b>Market</b><span>Big and growing?</span></li>
+    <li><b>Competition</b><span>Getting crowded?</span></li>
+    <li><b>Economics</b><span>Does one unit work?</span></li>
+    <li><b>Right to win</b><span>Why us?</span></li>
+  </ol>
+  <p class="cycle-note">Then decide how to enter: build, partner, or buy</p>
+
+  <p class="h-sec">Ten terms to drop naturally</p>
+  <div class="vocab">
+    <div class="term" data-say><b>Market entry</b><p>Moving into a business the company isn't in today. The core question: can we make money there, and why us?</p></div>
+    <div class="term" data-say><b>Supply and demand</b><p>When supply, like new clubs, grows faster than demand, like new players, prices and utilization fall.</p></div>
+    <div class="term" data-say><b>Utilization</b><p>The share of capacity that's actually used, like the share of court-hours that get booked.</p></div>
+    <div class="term" data-say><b>Seasonality</b><p>Demand that rises and falls with the time of year. Indoor courts are busiest in winter.</p></div>
+    <div class="term" data-say><b>Unit economics</b><p>The profit of one unit, like one club, before you multiply it across many.</p></div>
+    <div class="term" data-say><b>Incremental cost</b><p>Only the costs that change because of a decision. Rent you pay either way doesn't count.</p></div>
+    <div class="term" data-say><b>Break-even</b><p>The point where revenue exactly covers costs. Here, the utilization a club needs to stop losing money.</p></div>
+    <div class="term" data-say><b>Payback period</b><p>How long profits take to repay the upfront cost. 1.2 million earning 360 thousand a year pays back in about 3 years.</p></div>
+    <div class="term" data-say><b>Right to win</b><p>An advantage that lets a company beat rivals in a new market, like cheaper space or existing customers.</p></div>
+    <div class="term" data-say><b>Pilot</b><p>A small test before a full rollout, with a clear target that decides whether to expand.</p></div>
+  </div>
+</section>
+
+<!-- 02 PROMPT -->
+<section class="step" id="prompt">
+  <div class="sh"><span class="idx">02</span><h2>The case prompt</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Our client is Fairway Sports, a national sporting goods retailer with about 300 big-box stores and about 4 billion dollars in revenue.</p>
+    <p data-say>As more shopping has moved online, many Fairway stores now have large areas of unused space, and Fairway pays rent on that space either way. Meanwhile, pickleball has grown quickly, and indoor pickleball clubs are opening in many cities.</p>
+    <p data-say>Fairway's CEO is asking: should we turn unused store space into indoor pickleball clubs? And if so, how should we do it?</p>
+  </div>
+  <div class="facts">
+    <div><div class="k">Stores</div><div class="v">300</div><div class="d">Big-box, across the U.S.</div></div>
+    <div><div class="k">Revenue</div><div class="v">$4B</div><div class="d">Sporting goods</div></div>
+    <div><div class="k">Stores with space</div><div class="v">120</div><div class="d">About 20,000 sq ft free each</div></div>
+    <div><div class="k">Question</div><div class="v">Enter?</div><div class="d">And if so, how</div></div>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Restate the question in one sentence, then say what you'd like to clarify.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="20">20s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-prompt" aria-expanded="false">Show a strong answer</button></div>
+  </div>
+  <div class="ans" id="a-prompt" hidden>
+    <p class="who">Strong answer</p>
+    <div class="script"><p data-say>"So Fairway wants to know whether to turn its unused store space into indoor pickleball clubs, and if so, how to do it. Is that right? I have a few quick questions first."</p></div>
+    <p class="note" data-say>Interviewer: "Go ahead." Notice the restatement keeps both parts of the question: whether, and how.</p>
+  </div>
+</section>
+
+<!-- 03 CLARIFY -->
+<section class="step" id="clarify">
+  <div class="sh"><span class="idx">03</span><h2>Clarifying questions</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Ask two or three clarifying questions. Pick ones whose answers would change your approach.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-clarify" aria-expanded="false">Show strong questions</button></div>
+  </div>
+  <div class="ans" id="a-clarify" hidden>
+    <p class="who">Strong questions, with the interviewer's answers</p>
+    <ul class="qa">
+      <li data-say><div class="q">Is the goal profit from the clubs, or more shoppers in stores?</div><div class="a">Mostly a new profit stream. More shoppers in the store would be a bonus.</div></li>
+      <li data-say><div class="q">How much space, and in how many stores?</div><div class="a">About 120 stores have roughly 20,000 square feet free, enough for about 8 courts each.</div></li>
+      <li data-say><div class="q">Does Fairway pay extra for that space?</div><div class="a">No. It already pays rent on it under long leases, whether the space is used or not.</div></li>
+      <li data-say><div class="q">Any budget or timeline?</div><div class="a">Up to 50 million dollars over three years. The board wants a plan in two months.</div></li>
+      <li data-say><div class="q">Does Fairway have any link to pickleball today?</div><div class="a">It sells pickleball gear, which has been one of its fastest-growing categories.</div></li>
+    </ul>
+    <p class="note" style="margin-top:12px" data-say>The third question is the one that cracks this case: if the rent is already paid, it isn't a cost of the clubs.</p>
+  </div>
+</section>
+
+<!-- 04 FRAMEWORK -->
+<section class="step" id="framework">
+  <div class="sh"><span class="idx">04</span><h2>Build the framework</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Okay. How do you want to approach this?</p>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Take 60 seconds to sketch your structure. Then walk through it, say where you'd start, and ask for specific data.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-frame" aria-expanded="false">Show a strong framework</button></div>
+  </div>
+  <div class="ans" id="a-frame" hidden>
+    <p class="who">Strong framework</p>
+    <div class="tree">
+      <div class="root">Should Fairway turn unused store space into pickleball clubs, and how?</div>
+      <div class="branches">
+        <div class="branch"><span class="n">1</span><b>Market</b><ul><li>Players near Fairway stores</li><li>Growth, and how long it lasts</li><li>Indoor demand by season</li></ul></div>
+        <div class="branch"><span class="n">2</span><b>Competition</b><ul><li>How fast clubs are opening</li><li>Rivals' prices and utilization</li><li>Free outdoor courts</li></ul></div>
+        <div class="branch"><span class="n">3</span><b>Club economics</b><ul><li>Courts × hours × use × price</li><li>Incremental costs only</li><li>Break-even and payback</li></ul></div>
+        <div class="branch"><span class="n">4</span><b>Right to win and how</b><ul><li>Free space, store traffic</li><li>Gear sales and brand</li><li>Build, partner, or buy</li></ul></div>
+      </div>
+    </div>
+    <h3>Say it like this</h3>
+    <div class="script">
+      <p data-say>"I'd look at four things. First, the market: how many people play near Fairway stores, how fast that's growing, and how much of it is indoors. Second, competition: how many clubs are opening, and what's happening to their prices and utilization. Third, the economics of one club, counting only the costs that change because of this decision. Fourth, why Fairway should win, and whether to build, partner, or buy. My hypothesis is that Fairway has a real cost advantage because the space is already paid for, but that the market could be getting crowded. I'd like to start with market and competitor trends."</p>
+    </div>
+    <h3>Why it works</h3>
+    <ul data-say>
+      <li>It sizes demand and supply together, which catches a crowding market early.</li>
+      <li>It flags incremental cost up front, which is the key insight in this case.</li>
+      <li>It ends with "how," because the CEO asked that too.</li>
+    </ul>
+    <p class="note" data-say>If you blank, "market, competition, economics, right to win" works for almost any market entry case.</p>
+  </div>
+</section>
+
+<!-- 05 EXHIBIT 1 -->
+<section class="step" id="ex1">
+  <div class="sh"><span class="idx">05</span><h2>Exhibit 1: the market and the competition</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Here's what you asked for: six years of data for the metro areas where Fairway has unused space. What stands out?</p>
+  </div>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Pickleball in Fairway's target metros</span><span class="ex-ref">Exhibit 1 · WP-MKT-01</span></div>
+    <p class="ex-s">Yearly figures, 2020 to 2025. Each panel has its own scale, starting at zero.</p>
+    <div class="multiples" id="mult"></div>
+    <div class="row" style="margin-top:12px"><button class="btn small reveal" type="button" aria-controls="t-ex1" aria-expanded="false">Show as table</button></div>
+    <div class="tblwrap" id="t-ex1" hidden></div>
+    <figcaption>Source: market survey, club operator data, and Fairway sales (case data).</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="1">
+    <div class="mc-head"><p class="stem" data-say>Which finding should you lead with?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>Players keep growing, so any new club will do well.</button>
+      <button class="opt" type="button" data-say>Demand is still growing but slowing, while clubs are opening much faster. Prices and utilization at rival clubs are falling, so the market is getting crowded.</button>
+      <button class="opt" type="button" data-say>Fairway's gear sales are falling.</button>
+      <button class="opt" type="button" data-say>Indoor play is becoming less popular.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>Players grew from 300 thousand to 960 thousand, but growth slowed from about 40 percent a year to about 7. Clubs went from 10 to 80, eight times as many. With supply outrunning demand, rival utilization fell from 70 to 45 percent, and prices fell from 60 to 45 dollars a court-hour. Those are classic signs of a crowding market. One bright spot: half of players now play indoors in winter.</p>
+    </div>
+  </div>
+
+  <div class="move">
+    <span class="lbl">Then</span>
+    <p data-say>Say the insight, tie it to the decision, and ask for your next piece of data.</p>
+    <div class="acts"><button class="btn primary small reveal" type="button" aria-controls="a-ex1" aria-expanded="false">Show how to say it</button></div>
+  </div>
+  <div class="ans" id="a-ex1" hidden>
+    <p class="who">Say it like this</p>
+    <div class="script"><p data-say>"Pickleball is still growing, but it's slowing, from about 40 percent a year to 7. Meanwhile clubs have multiplied eight times, so rival utilization dropped to 45 percent and prices fell by a quarter. That's a crowding market, so any club Fairway opens has to work at today's lower prices and utilization. Can I see what a club costs to run, and how Fairway's costs would compare with a rival's?"</p></div>
+    <p class="note" data-say>Notice the pattern: insight, then so-what for the decision, then your own next ask. That's how you move a candidate-led case forward.</p>
+  </div>
+</section>
+
+<!-- 06 EXHIBIT 2 -->
+<section class="step" id="ex2">
+  <div class="sh"><span class="idx">06</span><h2>Exhibit 2: a rival club vs. a Fairway club</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Good. Here are yearly running costs for a typical 8-court rival club, next to what a Fairway club would cost. A typical rival brings in about 810 thousand dollars a year at today's prices. What's your read?</p>
+  </div>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Yearly running costs, 8-court club</span><span class="ex-ref">Exhibit 2 · WP-ECO-02 · $ thousands</span></div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Staff</span><span><i style="background:var(--fg-2)"></i>Utilities, cleaning, booking software</span><span><i style="background:var(--s2)"></i>Rent</span></div>
+    <div class="hbar" id="hb"></div>
+    <figcaption>Fairway pays no extra rent because it already pays for the space either way. Source: club operator data and Fairway estimates (case data).</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="2">
+    <div class="mc-head"><p class="stem" data-say>What's the so-what?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>Fairway's clubs would cost about the same as rivals'.</button>
+      <button class="opt" type="button" data-say>Fairway should still count the rent, so its club would lose money too.</button>
+      <button class="opt" type="button" data-say>At today's prices a typical rival loses money, but a Fairway club would still make a profit because it pays no extra rent. Fairway can survive a shakeout that rivals can't.</button>
+      <button class="opt" type="button" data-say>Fairway should charge more than rivals.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>A rival brings in about 810 thousand but spends 850, so it loses about 40 thousand a year. Fairway would spend about 450, because the space is already paid for. Counting that rent would be a mistake, since Fairway pays it whether or not it builds courts. That's the incremental cost idea. So at the same prices, a Fairway club would earn about 360 thousand. If the market shakes out, rivals close first.</p>
+    </div>
+  </div>
+
+  <div class="move">
+    <span class="lbl">Then</span>
+    <p data-say>Synthesize both exhibits in three sentences.</p>
+    <div class="acts"><button class="btn primary small reveal" type="button" aria-controls="a-ex2" aria-expanded="false">Show how to say it</button></div>
+  </div>
+  <div class="ans" id="a-ex2" hidden>
+    <p class="who">Say it like this</p>
+    <div class="script"><p data-say>"The market is crowding: player growth has slowed while clubs have multiplied, so prices and utilization are falling. At today's levels a typical rival loses money, but Fairway, paying no extra rent, would still earn about 360 thousand per club. So Fairway has a real cost edge, but it should enter carefully, in metros where clubs are still scarce."</p></div>
+  </div>
+</section>
+
+<!-- 07 CLUB MATH -->
+<section class="step" id="sizing">
+  <div class="sh"><span class="idx">07</span><h2>Club math: one club, then the network</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>Unit economics first: courts times hours times utilization times price. Then break-even, payback, and how many clubs make sense.</p>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Let's size it. What does one 8-court Fairway club earn at today's prices and utilization, how long until it pays back, and what's it worth across the chain?</p>
+  </div>
+  <div class="given">
+    <div><div class="k">Courts per club</div><div class="v">8</div></div>
+    <div><div class="k">Hours open per court, per year</div><div class="v">5,000</div></div>
+    <div><div class="k">Utilization at rivals today</div><div class="v">45%</div></div>
+    <div><div class="k">Price per court-hour</div><div class="v">$45</div></div>
+    <div><div class="k">Fairway's running costs per year</div><div class="v">$450K</div></div>
+    <div><div class="k">Rival's running costs, with rent</div><div class="v">$850K</div></div>
+    <div><div class="k">Build-out cost per club</div><div class="v">$1.2M</div></div>
+    <div><div class="k">Stores in metros with few clubs</div><div class="v">40</div></div>
+    <div><div class="k">Budget</div><div class="v">$50M</div></div>
+  </div>
+  <p class="src">Case assumptions. About $45 a court-hour works out to roughly $11 per player for a game of four.</p>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Say the formula first: revenue equals courts times hours times utilization times price. Then profit, break-even utilization, payback, and the network.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="120">2 min timer</button></div>
+  </div>
+  <div class="stepper" style="margin-top:14px">
+    <ol class="calc">
+      <li class="st" hidden data-say="Step 1. Capacity. 8 courts times 5,000 hours is 40 thousand court-hours a year."><span class="t">1 · Capacity</span><span class="f">8 courts × 5,000 hours</span><span class="r tnum">40,000</span></li>
+      <li class="st" hidden data-say="Step 2. Revenue. 40 thousand times 45 percent is 18 thousand booked hours. Times 45 dollars is 810 thousand dollars."><span class="t">2 · Revenue</span><span class="f">40,000 × 45% = 18,000 hours × $45</span><span class="r tnum">$810K</span></li>
+      <li class="st" hidden data-say="Step 3. Profit. 810 thousand minus 450 thousand is 360 thousand dollars a year. A rival with 850 thousand of costs loses about 40 thousand."><span class="t">3 · Profit</span><span class="f">$810K − $450K. A rival: $810K − $850K = −$40K</span><span class="r tnum">$360K</span></li>
+      <li class="st" hidden data-say="Step 4. Break-even utilization. Full capacity is 40 thousand hours times 45 dollars, or 1.8 million. 450 thousand divided by 1.8 million is 25 percent. A rival needs 850 thousand divided by 1.8 million, about 47 percent, above today's 45."><span class="t">4 · Break-even utilization</span><span class="f">$450K ÷ $1.8M full capacity. Rival: $850K ÷ $1.8M ≈ 47%</span><span class="r tnum">25%</span></li>
+      <li class="st" hidden data-say="Step 5. Payback. 1.2 million divided by 360 thousand is about 3.3 years."><span class="t">5 · Payback</span><span class="f">$1.2M ÷ $360K</span><span class="r tnum">≈3.3 yrs</span></li>
+      <li class="st" hidden data-say="Step 6. The network. 40 clubs times 360 thousand is about 14 million dollars a year, for 48 million of build-out, inside the 50 million budget."><span class="t">6 · Network</span><span class="f">40 × $360K ≈ $14M a year, for 40 × $1.2M = $48M</span><span class="r tnum">$14M / yr</span></li>
+    </ol>
+    <div class="row"><button class="btn primary small next" type="button">Reveal step 1 of 6</button><button class="btn small reset" type="button">Start over</button></div>
+  </div>
+
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Utilization needed to break even</span><span class="ex-ref">Share of court-hours booked</span></div>
+    <div class="hbar" id="siz"></div>
+    <figcaption>A Fairway club breaks even at about half the utilization a rival needs.</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="0">
+    <div class="mc-head"><p class="stem" data-say>Quick check: at what utilization does a Fairway club break even?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>25 percent</button>
+      <button class="opt" type="button" data-say>45 percent</button>
+      <button class="opt" type="button" data-say>47 percent</button>
+      <button class="opt" type="button" data-say>10 percent</button>
+    </div>
+    <div class="why" hidden><p data-say>Running costs of 450 thousand divided by full-capacity revenue of 1.8 million is 25 percent. Everyday version: if a lemonade stand costs 25 dollars a day to run and could take in 100 dollars if every cup sold, it needs to sell a quarter of its cups to break even.</p></div>
+  </div>
+
+  <div class="chipset" aria-label="Key results">
+    <span><b>Revenue</b> = $810K a club</span>
+    <span><b>Profit</b> = $360K, payback ≈ 3.3 years</span>
+    <span><b>Break-even</b> = 25% vs. rivals' 47%</span>
+  </div>
+  <div class="move">
+    <span class="lbl">Then</span>
+    <p data-say>Summarize the math in two sentences, and add one sanity check.</p>
+    <div class="acts"><button class="btn primary small reveal" type="button" aria-controls="a-size" aria-expanded="false">Show how to say it</button></div>
+  </div>
+  <div class="ans" id="a-size" hidden>
+    <p class="who">Say it like this</p>
+    <div class="script"><p data-say>"One 8-court club brings in about 810 thousand at today's prices and utilization and costs 450 thousand to run, so it earns about 360 thousand and pays back in a little over 3 years. It breaks even at 25 percent utilization, while a rival paying rent needs about 47, which is above today's 45. Forty clubs in metros with few rivals would earn about 14 million a year for 48 million, within budget."</p></div>
+    <p class="note" data-say>If the interviewer asks, "What if utilization falls to 30 percent in a shakeout?": "Revenue drops to about 540 thousand, so profit falls to about 90 thousand, still positive. Most rivals would be losing a lot of money by then, which is exactly why Fairway's cost edge matters."</p>
+  </div>
+</section>
+
+<!-- 08 OPTIONS -->
+<section class="step" id="prioritize">
+  <div class="sh"><span class="idx">08</span><h2>Score the ways to play</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Say Fairway goes ahead. Here are six ways it could play. Score each for ease and impact, from 1 to 5. Which three would you combine?</p>
+  </div>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Option map: ease × impact</span><span class="ex-ref">Exhibit 3 · Team's option list</span></div>
+    <div class="seg" role="group" aria-label="Which scores to plot">
+      <button class="btn small" type="button" id="mMine" aria-pressed="true">Your scores</button>
+      <button class="btn small" type="button" id="mTeam" aria-pressed="false" disabled>Team's scores</button>
+    </div>
+    <div class="heat">
+      <div>
+        <div id="heatmap"></div>
+        <p class="mapnote" id="mapnote">Your dots appear here as you score each option.</p>
+      </div>
+      <div>
+        <p class="mapnote" style="margin:0 0 6px">Pick E (ease) and I (impact): 1 is low, 5 is high.</p>
+        <ul class="reg scorer" id="scorer"></ul>
+        <p class="mytop" id="mytop" aria-live="polite">Score all six to see your top three.</p>
+        <div class="ramp" aria-hidden="true">Score <i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i><i style="background:var(--h5)"></i> higher</div>
+      </div>
+    </div>
+    <figcaption>Score = ease × impact. Options are from the case; scores are yours to set.</figcaption>
+  </figure>
+
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Score each option out loud with a one-line reason, then name the three you'd combine.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="120">2 min timer</button><button class="btn primary small reveal" type="button" id="rv-prio" aria-controls="a-prio" aria-expanded="false">Show the team's scores</button></div>
+  </div>
+  <div class="ans" id="a-prio" hidden>
+    <p class="who">The team's scores, with reasons</p>
+    <ul class="reg" id="teamlist"></ul>
+    <h3>Say it like this</h3>
+    <div class="script"><p data-say>"I'd combine three. Run leagues and coaching to fill quiet hours, because utilization makes or breaks a club. Build clubs in unused space, but only in metros with few rivals. And bundle memberships with gear discounts to bring players into the store. Leasing the space to an operator is easier, but it hands away Fairway's cost advantage."</p></div>
+  </div>
+
+  <div class="mc" data-answer="0">
+    <div class="mc-head"><p class="stem" data-say>Which three would you combine?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>B, A, and C: leagues and coaching, building in the right metros, and the gear bundle.</button>
+      <button class="opt" type="button" data-say>D, E, and F: lease to an operator, buy a chain, and parking-lot courts.</button>
+      <button class="opt" type="button" data-say>A, E, and F.</button>
+      <button class="opt" type="button" data-say>All six at once, with equal effort.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>B, A, and C score highest and reinforce each other: build where clubs are scarce, fill the courts, and turn players into shoppers. D is easy but gives away the cost edge. E, buying a chain, is costly in a market that may be about to shake out; it may be cheaper to buy later. F only works in summer, when indoor demand is lowest anyway.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 09 RECOMMEND -->
+<section class="step" id="recommend">
+  <div class="sh"><span class="idx">09</span><h2>The recommendation</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>The CEO just walked in. You have 60 seconds. Should Fairway do this, and how?</p>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Lead with the answer. Then three reasons, the main risk, and next steps.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-rec" aria-expanded="false">Show a strong answer</button></div>
+  </div>
+  <div class="ans" id="a-rec" hidden>
+    <p class="who">Strong answer</p>
+    <div class="struct"><span>Answer</span><span>3 reasons</span><span>Risk</span><span>Next steps</span></div>
+    <div class="script">
+      <p data-say>"Fairway should enter, but start small: open 5 pilot clubs in unused store space in metros with few rival clubs, then expand to about 40 if they hit their targets."</p>
+      <p data-say>"First, Fairway has a real cost edge. Because the space is already paid for, a club breaks even at about 25 percent utilization, while rivals need about 47. Each club earns about 360 thousand dollars a year and pays back in about 3 years."</p>
+      <p data-say>"Second, the market is crowding, so where Fairway opens matters. Clubs have multiplied eight times while player growth slowed to about 7 percent, and rival utilization is down to 45 percent. Fairway should only open where clubs are still scarce."</p>
+      <p data-say>"Third, Fairway can fill courts better than rivals. Leagues and coaching fill quiet hours, and bundling memberships with gear discounts brings players into the store, where pickleball gear is already a 130 million dollar category."</p>
+      <p data-say>"The main risk is that pickleball's growth stalls and the shakeout is worse than expected. The pilot limits that: if the first 5 clubs don't average about 40 percent utilization within a year, Fairway stops at 5. Next steps: pick 5 stores in cold-weather metros with few rivals, design leagues and coaching before opening, and set up the gear bundle."</p>
+    </div>
+    <h3>The rollout plan</h3>
+    <div class="road">
+      <div class="phase" data-say><span class="d">Months 1–6</span><b>Pilot</b><ul><li>Build 5 clubs in the best-fit stores.</li><li>Launch leagues and coaching from day one.</li><li>Set up the gear bundle.</li></ul></div>
+      <div class="phase" data-say><span class="d">Months 7–12</span><b>Prove</b><ul><li>Track utilization by month.</li><li>Gate: about 40% average utilization.</li></ul></div>
+      <div class="phase" data-say><span class="d">Year 2</span><b>Scale</b><ul><li>Roll out to about 40 metros.</li><li>Watch for weak rivals to buy cheaply in a shakeout.</li></ul></div>
+    </div>
+    <h3>Indicators to track</h3>
+    <ul data-say>
+      <li>Average utilization. Target: 40 percent or more.</li>
+      <li>Profit per club. Target: 300 thousand dollars a year or more.</li>
+      <li>Members who also buy gear in the store. Target: half or more.</li>
+      <li>Payback per club. Target: 4 years or less.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10 DRILLS -->
+<section class="step" id="drills">
+  <div class="sh"><span class="idx">10</span><h2>Bonus drills: market sizing and growth</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub">Two short reps. Market sizing is the most common add-on question in growth cases.</p>
+
+  <div class="drill">
+    <h3>Market sizing: clubs one metro can support</h3>
+    <div class="iv">
+      <p class="who">Interviewer</p>
+      <p data-say>How many 8-court indoor pickleball clubs can a metro area of 2 million people support in winter?</p>
+    </div>
+    <div class="move">
+      <span class="lbl">Your move</span>
+      <p data-say>Work from demand to supply: people, players, court-hours they want, then divide by what one club can handle. Say each assumption out loud.</p>
+      <div class="acts"><button class="btn small timer" type="button" data-secs="90">90s timer</button></div>
+    </div>
+    <div class="stepper" style="margin-top:14px">
+      <ol class="calc">
+        <li class="st" hidden data-say="Start broad. 2 million people times about 5 percent who play regularly is 100 thousand players."><span class="t">Players</span><span class="f">2M people × 5%</span><span class="r tnum">100K</span></li>
+        <li class="st" hidden data-say="About half play indoors in winter, so 50 thousand indoor players."><span class="t">× 50% play indoors in winter</span><span class="f">Indoor players</span><span class="r tnum">50K</span></li>
+        <li class="st" hidden data-say="Each plays once a week for an hour, four to a court. 50 thousand divided by 4 is 12,500 court-hours a week."><span class="t">Court-hours a week</span><span class="f">50K players, once a week, 4 per court</span><span class="r tnum">12,500</span></li>
+        <li class="st" hidden data-say="Over a 20-week winter, that's 250 thousand court-hours."><span class="t">Over a 20-week winter</span><span class="f">12,500 × 20</span><span class="r tnum">250K</span></li>
+        <li class="st" hidden data-say="One club's winter capacity. 8 courts times 14 hours a day times 140 days is about 15 thousand court-hours. 250 thousand divided by 15 thousand is about 17 clubs."><span class="t">Clubs supported</span><span class="f">8 × 14 hours × 140 days ≈ 15,000. 250K ÷ 15K</span><span class="r tnum">≈17</span></li>
+        <li class="st" hidden data-say="So what. If the metro already has 10 clubs, there's room for a few more. If it has 20, it's overbuilt, and Fairway should skip it. The interviewer is grading your structure, not the exact number."><span class="t">So what</span><span class="f">10 clubs already: room for more. 20 or more: overbuilt, skip it</span><span class="r tnum">✓</span></li>
+      </ol>
+      <div class="row"><button class="btn primary small next" type="button">Reveal step 1 of 6</button><button class="btn small reset" type="button">Start over</button></div>
+    </div>
+    <p class="src">All inputs are interview-style assumptions, not market research.</p>
+  </div>
+
+  <div class="drill">
+    <h3>Market growth: is pickleball a fad?</h3>
+    <div class="iv">
+      <p class="who">Interviewer</p>
+      <p data-say>Is pickleball a lasting business, or a fad? How would that change your recommendation?</p>
+    </div>
+    <div class="move">
+      <span class="lbl">Your move</span>
+      <p data-say>Split growth into more players and more spend per player, then list drivers and headwinds.</p>
+      <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-growth" aria-expanded="false">Show a strong answer</button></div>
+    </div>
+    <div class="ans" id="a-growth" hidden>
+      <p class="who">Strong answer</p>
+      <div class="eq">Market growth = more players × more spend per player</div>
+      <div class="drivers">
+        <div data-say><b>Easy to start</b><p>Simple to learn, cheap gear, and fun at almost any age.</p></div>
+        <div data-say><b>Social</b><p>Games of four and leagues make it a regular habit with friends.</p></div>
+        <div data-say><b>Weather</b><p>In cold or rainy places, indoor courts are the only option for months.</p></div>
+        <div data-say><b>More spend per player</b><p>Leagues, coaching, and better gear raise what each player spends.</p></div>
+      </div>
+      <h3>Headwinds</h3>
+      <ul data-say>
+        <li>Player growth is slowing fast.</li>
+        <li>Free public courts compete with paid clubs, especially in summer.</li>
+        <li>Players could move on to the next racket sport, like padel.</li>
+      </ul>
+      <h3>Quick math</h3>
+      <p data-say>At 40 percent a year, players double in under 2 years. At 7 percent, it takes about 10 years: 72 divided by 7. That slowdown is why Fairway should pilot first.</p>
+      <div class="script"><p data-say>"I think pickleball lasts as a sport, but the boom phase is over, and the club market will shake out. That supports entering with a cost advantage and a small pilot, not a big bet on continued fast growth."</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 TEST -->
+<section class="step test" id="test">
+  <div class="sh"><span class="idx">11</span><h2>Practice test</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>Twelve multiple-choice questions on growth strategy and the Fairway case. Pick an answer to see the explanation.</p>
+  <div class="scorebar"><span class="score" id="score">0 / 0<small>answered 0 of 12</small></span><button class="btn small" type="button" id="resetTest">Reset test</button></div>
+  <div id="testq"></div>
+  <div class="done" id="done" hidden></div>
+</section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>An original practice case written in the style of EY-Parthenon interviews. It isn't an official EY or EY-Parthenon case. All figures, exhibits, and companies are invented. Format notes come from public interview prep guides, and formats vary by office.</p>
+    <p>Night-before tip: run steps 04, 07, and 09 out loud once more in the morning, then take the test.</p>
+  </div>
+</footer>
+<div id="tip" hidden role="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const NS="http://www.w3.org/2000/svg";
+  const svgEl=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const LET="ABCD";
+
+  /* ---------- tooltip ---------- */
+  const tip=$("#tip");
+  function showTip(el,x,y){tip.textContent=el.getAttribute("data-tip");tip.hidden=false;
+    const w=tip.offsetWidth,h=tip.offsetHeight;let L=x+12,T=y-h-10;
+    if(L+w>innerWidth-8)L=x-w-12; if(T<8)T=y+14; tip.style.left=Math.max(8,L)+"px";tip.style.top=T+"px";}
+  document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(t)showTip(t,e.clientX,e.clientY);else tip.hidden=true;});
+  document.addEventListener("focusin",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(t){const r=t.getBoundingClientRect();showTip(t,r.left+r.width/2,r.top);}});
+  document.addEventListener("focusout",()=>{tip.hidden=true;});
+  addEventListener("scroll",()=>{tip.hidden=true;},{passive:true});
+
+  /* ---------- reveal toggles ---------- */
+  $$(".reveal").forEach(b=>{const t=document.getElementById(b.getAttribute("aria-controls"));const show=b.textContent;
+    const hide=show.startsWith("Show as")?"Hide table":"Hide";
+    b.addEventListener("click",()=>{const open=t.hidden;t.hidden=!open;b.setAttribute("aria-expanded",String(open));b.textContent=open?hide:show;});});
+
+  /* ---------- timers ---------- */
+  let actx=null;
+  function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,actx.currentTime);g.gain.exponentialRampToValueAtTime(.2,actx.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+.5);o.connect(g).connect(actx.destination);o.start();o.stop(actx.currentTime+.55);}catch(e){}}
+  $$(".timer").forEach(b=>{const secs=+b.dataset.secs,label=b.textContent;let id=null,left=0;
+    const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+    b.addEventListener("click",()=>{
+      if(id){clearInterval(id);id=null;b.textContent=label;b.setAttribute("aria-pressed","false");return;}
+      try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+      left=secs;b.textContent=fmt(left)+" · stop";b.setAttribute("aria-pressed","true");
+      id=setInterval(()=>{left--;if(left<=0){clearInterval(id);id=null;b.textContent="Time. Answer now";b.setAttribute("aria-pressed","false");beep();setTimeout(()=>{if(!id)b.textContent=label;},4000);return;}b.textContent=fmt(left)+" · stop";},1000);
+    });});
+
+  /* ---------- steppers ---------- */
+  $$(".stepper").forEach(s=>{const steps=$$(".st",s),next=$(".next",s),reset=$(".reset",s);let i=0;
+    const upd=()=>{next.hidden=i>=steps.length;next.textContent="Reveal step "+(i+1)+" of "+steps.length;};
+    next.addEventListener("click",()=>{if(i<steps.length){steps[i].hidden=false;i++;upd();}});
+    reset.addEventListener("click",()=>{steps.forEach(x=>x.hidden=true);i=0;upd();});upd();});
+
+
+  /* ---------- chart builders ---------- */
+  function niceMax(m){const steps=[1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,120,150,200,250,300,400,500,600,800,1000,1200,1500,2000];for(const s of steps)if(s>=m)return s;return Math.ceil(m/500)*500;}
+  function roundTop(x,y,w,h,r){r=Math.min(r,h,w/2);return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`;}
+  function multiples(el,Q,SER){
+    SER.forEach(s=>{
+      const f=s.f||(v=>String(v)),n=s.v.length,last=n-1;
+      const card=document.createElement("div");card.className="mini";
+      card.innerHTML=`<div class="nm">${s.k}</div><div class="ch">${f(s.v[0])} → ${f(s.v[last])}</div>`;
+      const W=200,H=104,top=18,bot=20,pl=4,pr=4,ph=H-top-bot,band=(W-pl-pr)/n,bw=Math.min(22,band*.58),max=niceMax(Math.max(...s.v)*1.12);
+      const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":`${s.k}: ${s.v.map((v,i)=>Q[i]+" "+f(v)).join(", ")}`});
+      s.v.forEach((v,i)=>{const cx=pl+band*i+band/2,h=Math.max(1,v/max*ph),x=cx-bw/2,y=top+ph-h;
+        svg.appendChild(svgEl("path",{d:roundTop(x,y,bw,h,4),fill:"var(--s1)"}));
+        if(i===0||i===last){const t=svgEl("text",{x:cx,y:y-5,"text-anchor":"middle","font-size":"10.5","font-weight":"600",fill:"var(--fg-2)"});t.textContent=f(v);svg.appendChild(t);}
+        const q=svgEl("text",{x:cx,y:H-5,"text-anchor":"middle","font-size":n>5?"8.5":"9.5",fill:"var(--muted)"});q.textContent=Q[i];svg.appendChild(q);
+        svg.appendChild(svgEl("rect",{x:pl+band*i,y:0,width:band,height:H,fill:"transparent","data-tip":`${s.k} · ${Q[i]}: ${f(v)}`}));
+      });
+      svg.insertBefore(svgEl("line",{x1:0,x2:W,y1:top+ph+.5,y2:top+ph+.5,stroke:"var(--axis)","stroke-width":"1"}),svg.firstChild);
+      card.appendChild(svg);el.appendChild(card);
+    });
+  }
+  function multTable(el,Q,SER){
+    el.innerHTML=`<table><thead><tr><th>Measure</th>${Q.map(q=>`<th class="n">${q}</th>`).join("")}</tr></thead><tbody>${SER.map(s=>`<tr><td>${s.k}</td>${s.v.map(v=>`<td class="n">${(s.f||String)(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  }
+  function axis(el,o){const ax=document.createElement("div");ax.className="axis";
+    ax.innerHTML=`<div></div><div class="ticks">${o.ticks.map(v=>`<span style="left:${v/o.max*100}%">${o.tick(v)}</span>`).join("")}</div>`;el.appendChild(ax);
+    if(o.ref&&o.ref.note){const p=document.createElement("p");p.className="tolnote";p.textContent=o.ref.note;el.appendChild(p);}}
+  /* one bar per row: rows {d,t,v,lab,tip,st:{bad,txt}} */
+  function hbar(el,rows,o){
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";const w=r.v/o.max*100;
+      row.innerHTML=`<div class="hlab"><b>${r.d}</b>${r.t?`<span>${r.t}</span>`:""}${r.st?`<span class="status ${r.st.bad?"bad":"ok"}">${r.st.bad?"▲ ":"✓ "}${r.st.txt}</span>`:""}</div>
+        <div class="track" tabindex="0" data-tip="${r.tip||r.d+": "+r.lab}"><div class="bar" style="width:${Math.max(.4,w)}%"></div><span class="bval" style="left:${w}%">${r.lab}</span>${o.ref?`<div class="tol" style="left:${o.ref.at/o.max*100}%"></div>`:""}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+  /* stacked segments, total named in the label: rows {n,d,seg:[[v,cls,tip]]} */
+  function stack(el,rows,o){
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";let x=0,bars="";
+      r.seg.forEach(([v,c,t],i)=>{const left=x/o.max*100,w=v/o.max*100;
+        bars+=`<div class="bar ${c}" tabindex="0" data-tip="${t}" style="left:calc(${left}% + ${i?2:0}px);width:calc(${w}% - ${i?2:0}px);border-radius:${i===r.seg.length-1?"0 4px 4px 0":"0"}"></div>`;x+=v;});
+      row.innerHTML=`<div class="hlab"><b>${r.n}</b><span>${r.d}</span></div><div class="track">${bars}${o.ref?`<div class="tol" style="left:${o.ref.at/o.max*100}%"></div>`:""}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+  /* waterfall: rows {n,d,total} or {n,d,delta}; totals neutral, ups blue, downs orange */
+  function waterfall(el,rows,o){let run=0;
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";let bar,lab,tip;
+      if(r.total!==undefined){run=r.total;bar=`<div class="bar b3" style="width:${r.total/o.max*100}%"></div>`;lab=`<span class="bval" style="left:${r.total/o.max*100}%">${o.fmt(r.total)}</span>`;tip=`${r.n}: ${o.fmt(r.total)}`;}
+      else{const a=Math.min(run,run+r.delta),b=Math.max(run,run+r.delta);
+        bar=`<div class="bar ${r.delta<0?"b2":""}" style="left:${a/o.max*100}%;width:${(b-a)/o.max*100}%;border-radius:3px"></div>`;
+        lab=`<span class="bval" style="left:${b/o.max*100}%">${r.delta<0?"−":"+"}${o.fmt(Math.abs(r.delta))}</span>`;tip=`${r.n}: ${r.delta<0?"−":"+"}${o.fmt(Math.abs(r.delta))}`;run+=r.delta;}
+      row.innerHTML=`<div class="hlab"><b>${r.n}</b><span>${r.d}</span></div><div class="track" tabindex="0" data-tip="${tip}">${bar}${lab}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+
+  /* ---------- heat map you score ---------- */
+  function heatScorer(HM){
+    const band=s=>s>=20?5:s>=15?4:s>=9?3:s>=5?2:1;
+    const C=54,ox=84,oy=8,G=C*5,HW=ox+G+8,HH=oy+G+52;
+    const hs=svgEl("svg",{viewBox:`0 0 ${HW} ${HH}`,role:"img","aria-label":"Heat map"});
+    for(let X=1;X<=5;X++)for(let Y=1;Y<=5;Y++)
+      hs.appendChild(svgEl("rect",{x:ox+(X-1)*C+1,y:oy+(5-Y)*C+1,width:C-2,height:C-2,rx:3,fill:`var(--h${band(X*Y)})`}));
+    for(let k=1;k<=5;k++){
+      const t=svgEl("text",{x:ox+(k-.5)*C,y:oy+G+15,"text-anchor":"middle","font-size":"11",fill:"var(--fg-2)"});t.textContent=k;hs.appendChild(t);
+      if(HM.lx[k-1]){const t2=svgEl("text",{x:ox+(k-.5)*C,y:oy+G+28,"text-anchor":"middle","font-size":"9.5",fill:"var(--muted)"});t2.textContent=HM.lx[k-1];hs.appendChild(t2);}
+      const u=svgEl("text",{x:ox-8,y:oy+(5-k+.5)*C+4,"text-anchor":"end","font-size":"11",fill:"var(--fg-2)"});u.textContent=k;hs.appendChild(u);
+      if(HM.ly[k-1]){const u2=svgEl("text",{x:ox-20,y:oy+(5-k+.5)*C+4,"text-anchor":"end","font-size":"9.5",fill:"var(--muted)"});u2.textContent=HM.ly[k-1];hs.appendChild(u2);}
+    }
+    const xt=svgEl("text",{x:ox+G/2,y:oy+G+46,"text-anchor":"middle","font-size":"11","font-weight":"600",fill:"var(--fg)"});xt.textContent=HM.xName+" →";hs.appendChild(xt);
+    const yt=svgEl("text",{x:9,y:oy+G/2,"text-anchor":"middle","font-size":"11","font-weight":"600",fill:"var(--fg)",transform:`rotate(-90 9 ${oy+G/2})`});yt.textContent=HM.yName+" →";hs.appendChild(yt);
+    const dots=svgEl("g");hs.appendChild(dots);$("#heatmap").appendChild(hs);
+    const IT=HM.items,xn=HM.xName.toLowerCase(),yn=HM.yName.toLowerCase();
+    const opt=lab=>`<option value="">${lab}</option>`+[1,2,3,4,5].map(v=>`<option value="${v}">${v}</option>`).join("");
+    $("#scorer").innerHTML=IT.map(r=>`<li><span class="id">${r.id}</span><span class="nm">${r.n}</span><span class="pick"><select id="x-${r.id}" aria-label="${r.id} ${xn}, 1 to 5">${opt(HM.xs)}</select><select id="y-${r.id}" aria-label="${r.id} ${yn}, 1 to 5">${opt(HM.ys)}</select><span class="sc" id="s-${r.id}">–</span></span></li>`).join("");
+    const rank=(a,b)=>b.x*b.y-a.x*a.y||b.y-a.y;
+    $("#teamlist").innerHTML=[...IT].sort(rank).map(r=>`<li data-say="${r.id}. ${r.n}. ${HM.xName} ${r.x}, ${yn} ${r.y}, score ${r.x*r.y}. ${r.w}"><span class="id">${r.id}</span><span class="nm"><b>${r.n}</b><span class="w">${r.w}</span></span><span class="sc">${r.x}×${r.y} = ${r.x*r.y}</span></li>`).join("");
+    let mode="mine";
+    const mine=()=>IT.map(r=>({id:r.id,n:r.n,x:+$("#x-"+r.id).value,y:+$("#y-"+r.id).value})).filter(r=>r.x&&r.y);
+    const offsets=n=>n<=1?[[0,0]]:n===2?[[-12,0],[12,0]]:n<=4?[[-12,-11],[12,-11],[-12,11],[12,11]]:[[-15,-11],[0,-11],[15,-11],[-15,11],[0,11],[15,11]];
+    function plot(list){
+      while(dots.firstChild)dots.removeChild(dots.firstChild);
+      const cells={};list.forEach(r=>{const k=r.x+"-"+r.y;(cells[k]=cells[k]||[]).push(r);});
+      Object.values(cells).forEach(arr=>{const off=offsets(arr.length),big=arr.length===1,rad=big?14:arr.length<=4?10:8;
+        arr.forEach((r,j)=>{const cx=ox+(r.x-.5)*C+off[j][0],cy=oy+(5-r.y+.5)*C+off[j][1];
+          const g=svgEl("g",{tabindex:"0","data-tip":`${r.id} · ${r.n}: ${xn} ${r.x}, ${yn} ${r.y}, score ${r.x*r.y}`});
+          g.appendChild(svgEl("circle",{cx,cy,r:rad+2,fill:"var(--surface)"}));
+          g.appendChild(svgEl("circle",{cx,cy,r:rad,fill:"var(--dot)"}));
+          const t=svgEl("text",{x:cx,y:cy+(big?4:3),"text-anchor":"middle","font-size":big?"11":"8.5","font-weight":"600",fill:"var(--dot-ink)"});t.textContent=r.id;g.appendChild(t);
+          dots.appendChild(g);});});
+      hs.setAttribute("aria-label",`Heat map of ${xn} by ${yn}, ${mode==="team"?"team's scores":"your scores"}. `+(list.length?list.map(r=>`${r.id}: ${xn} ${r.x}, ${yn} ${r.y}`).join(". "):"Nothing scored yet."));
+    }
+    function render(){
+      const m=mine();
+      IT.forEach(r=>{const x=+$("#x-"+r.id).value,y=+$("#y-"+r.id).value;$("#s-"+r.id).textContent=x&&y?"= "+x*y:"–";});
+      const top=$("#mytop");
+      if(!m.length)top.textContent=`Score all ${IT.length} to see your top three.`;
+      else if(m.length<IT.length)top.textContent=`Scored ${m.length} of ${IT.length}. Score all ${IT.length} to see your top three.`;
+      else top.textContent="Your top three by score: "+[...m].sort(rank).slice(0,3).map(r=>`${r.id} (${r.x*r.y})`).join(", ")+".";
+      const note=$("#mapnote");
+      if(mode==="team"){plot(IT);note.textContent="Showing the team's scores. Switch back to compare with yours.";}
+      else{plot(m);note.textContent=m.length?"Showing your scores. Shared cells show dots side by side.":"Your dots appear here as you score each one.";}
+    }
+    function setMode(v){mode=v;$("#mMine").setAttribute("aria-pressed",String(v==="mine"));$("#mTeam").setAttribute("aria-pressed",String(v==="team"));render();}
+    $("#scorer").addEventListener("change",()=>{if(mode!=="mine")setMode("mine");else render();});
+    $("#mMine").addEventListener("click",()=>setMode("mine"));
+    $("#mTeam").addEventListener("click",()=>{if(!$("#mTeam").disabled)setMode("team");});
+    $("#rv-prio").addEventListener("click",()=>{$("#mTeam").disabled=false;setMode($("#a-prio").hidden?"mine":"team");});
+    render();
+  }
+
+  const PAGEKEY="fairway";
+  /* Exhibit 1 */
+  const Q=["2020","2021","2022","2023","2024","2025"];
+  const pc=v=>v+"%";
+  const SER=[
+    {k:"Pickleball players in target metros",v:[300,420,600,780,900,960],f:v=>v+"K"},
+    {k:"Indoor clubs in target metros",v:[10,14,22,35,55,80]},
+    {k:"Price per court-hour at rival clubs",v:[60,58,56,52,48,45],f:v=>"$"+v},
+    {k:"Utilization at rival clubs",v:[70,68,63,56,50,45],f:pc},
+    {k:"Players who play indoors in winter",v:[40,42,45,47,48,50],f:pc},
+    {k:"Fairway pickleball gear sales",v:[40,60,85,110,125,130],f:v=>"$"+v+"M"},
+  ];
+  multiples($("#mult"),Q,SER);multTable($("#t-ex1"),Q,SER);
+
+  /* Exhibit 2: running costs */
+  stack($("#hb"),[
+    {n:"Typical rival club",d:"$850K of costs vs. about $810K of revenue",seg:[[300,"","Staff: $300K"],[150,"b3","Utilities, cleaning, booking software: $150K"],[400,"b2","Rent: $400K"]]},
+    {n:"Fairway club",d:"$450K: no extra rent",seg:[[300,"","Staff: $300K"],[150,"b3","Utilities, cleaning, booking software: $150K"]]},
+  ],{max:1000,ticks:[0,250,500,750,1000],tick:v=>"$"+v+"K",ref:{at:810,note:"Vertical line = a typical club's revenue today, about $810K"}});
+
+  /* Club math chart */
+  hbar($("#siz"),[
+    {d:"Fairway club",t:"$450K ÷ $1.8M full capacity",v:25,lab:"25%"},
+    {d:"Rival club",t:"$850K ÷ $1.8M full capacity",v:47,lab:"≈47%"},
+  ],{max:60,ticks:[0,15,30,45,60],tick:v=>v+"%",ref:{at:45,note:"Vertical line = utilization at rival clubs today, 45%"}});
+
+  /* Options scorer */
+  heatScorer({xName:"Ease",yName:"Impact",xs:"E",ys:"I",lx:["Hard","","Medium","","Easy"],ly:["Small","","Medium","","Big"],items:[
+    {id:"A",n:"Build clubs in unused space, only in metros with few rivals",x:3,y:5,w:"Uses Fairway's free space, the source of its cost edge. Picking metros carefully avoids the crowding."},
+    {id:"B",n:"Run leagues, clinics, and coaching to fill quiet hours",x:4,y:4,w:"Utilization makes or breaks a club, and leagues book courts every week."},
+    {id:"C",n:"Bundle club memberships with gear discounts",x:4,y:3,w:"Brings players into the store, where gear is already a $130M category."},
+    {id:"D",n:"Lease the space to an existing club operator",x:5,y:2,w:"Easy, but rent from an operator is small, and it hands away the cost edge."},
+    {id:"E",n:"Buy a regional club chain",x:1,y:4,w:"Expensive in a market that may be about to shake out. Cheaper to buy later."},
+    {id:"F",n:"Put outdoor courts in store parking lots",x:3,y:2,w:"Only works in summer, when free public courts are everywhere."},
+  ]});
+
+  const TEST=[
+    {q:"In a market entry case, what should you check first?",o:["How big the market is and how crowded it's getting","Which color the courts should be","How to market the launch","What the CEO's favorite sport is"],a:0,w:"Size demand and supply before anything else. A hot market can still be a bad one to enter if it's crowding."},
+    {q:"Utilization means…",o:["The share of available court-hours that get booked","The number of courts in a club","The price per hour","The number of members"],a:0,w:"A club with 40,000 court-hours a year and 18,000 booked is at 45% utilization."},
+    {q:"Fairway already pays rent on its unused space. Should a club's profit include that rent?",o:["No. Fairway pays it either way, so it's not an incremental cost","Yes, always count all rent","Only in summer","Only if the club makes money"],a:0,w:"Only costs that change because of the decision count. This is the key insight of the case."},
+    {q:"8 courts × 5,000 hours a year is…",o:["4,000 court-hours","40,000 court-hours","400,000 court-hours","13,000 court-hours"],a:1,w:"8 × 5,000 = 40,000."},
+    {q:"40,000 court-hours × 45% booked × $45 an hour is about…",o:["$81K","$810K","$1.8M","$8.1M"],a:1,w:"40,000 × 45% = 18,000 hours. 18,000 × $45 = $810,000."},
+    {q:"At what utilization does a Fairway club break even?",o:["10%","25%","45%","47%"],a:1,w:"$450K of running costs ÷ $1.8M of full-capacity revenue = 25%."},
+    {q:"Why does a typical rival club lose money today?",o:["Its $400K of rent pushes costs to $850K, above its $810K of revenue","It charges too much","It has too many courts","It has no staff"],a:0,w:"Rivals need about 47% utilization to break even, but they're at 45%."},
+    {q:"Clubs grew 8 times while player growth slowed to 7% a year. That suggests…",o:["Supply is outrunning demand, so the market is crowding","Demand is outrunning supply","Prices will rise","Nothing; both are growing"],a:0,w:"That's why rival prices and utilization are falling."},
+    {q:"A $1.2M club that earns $360K a year pays back in about…",o:["1 year","2 years","3.3 years","10 years"],a:2,w:"$1.2M ÷ $360K ≈ 3.3 years."},
+    {q:"Why does seasonality matter for indoor clubs?",o:["Demand peaks in winter and drops in summer, so utilization swings during the year","Courts wear out in winter","Prices are set by the season","It doesn't matter"],a:0,w:"That's why cold-weather metros and summer leagues matter for the plan."},
+    {q:"Fairway's right to win comes mainly from…",o:["Already-paid-for space, store traffic, and gear sales","Being the first club in every city","Having the lowest prices","Owning a pickleball league"],a:0,w:"Those advantages let it break even at half the utilization rivals need."},
+    {q:"Which is the strongest opening line for your recommendation?",o:["Let me walk you through everything I looked at.","Pickleball is a really interesting market.","It depends on how the market evolves.","Fairway should enter, but start with 5 pilot clubs in metros with few rivals, and expand to about 40 if they hit their targets."],a:3,w:"Lead with the answer, including the how. EY-Parthenon-style interviewers push back on \"it depends.\""},
+  ];
+  const testq=$("#testq");
+  TEST.forEach((t,n)=>{const d=document.createElement("div");d.className="mc";d.dataset.answer=t.a;d.dataset.group="test";
+    d.innerHTML=`<div class="mc-head"><p class="stem" data-say="Question ${n+1}. ${t.q.replace(/"/g,"&quot;")}"><span class="qn">Q${n+1}</span>${t.q}</p><button class="btn small qlisten" type="button" aria-label="Listen to question ${n+1}">Listen</button></div>
+      <div class="opts">${t.o.map(o=>`<button class="opt" type="button" data-say="${o.replace(/"/g,"&quot;")}">${o}</button>`).join("")}</div>
+      <div class="why" hidden><p data-say="${t.w.replace(/"/g,"&quot;")}">${t.w}</p></div>`;
+    testq.appendChild(d);});
+
+  /* ---------- multiple choice engine ---------- */
+  function setupMC(mc){const opts=$$(".opt",mc);
+    opts.forEach((o,i)=>{if(!o.querySelector(".L")){const x=document.createElement("span");x.className="x";while(o.firstChild)x.appendChild(o.firstChild);
+        const L=document.createElement("span");L.className="L";L.textContent=LET[i];o.append(L,x);
+        o.dataset.say=LET[i]+". "+(o.dataset.say||x.textContent);}
+      o.addEventListener("click",()=>answer(mc,i));});}
+  function answer(mc,i){if(mc.dataset.done)return;mc.dataset.done="1";const a=+mc.dataset.answer,opts=$$(".opt",mc);
+    opts.forEach((o,k)=>{o.disabled=true;if(k===a){o.classList.add("right");o.insertAdjacentHTML("beforeend",`<span class="tag">✓ ${k===i?"Correct":"Answer"}</span>`);}
+      else if(k===i){o.classList.add("wrong");o.insertAdjacentHTML("beforeend",`<span class="tag">✕ Your pick</span>`);}});
+    mc.dataset.correct=String(i===a);$(".why",mc).hidden=false;if(mc.dataset.group==="test")score();}
+  function resetMC(mc){delete mc.dataset.done;delete mc.dataset.correct;$$(".opt",mc).forEach(o=>{o.disabled=false;o.classList.remove("right","wrong");const t=$(".tag",o);if(t)t.remove();});$(".why",mc).hidden=true;}
+  $$(".mc").forEach(setupMC);
+  function score(){const qs=$$('.mc[data-group="test"]'),done=qs.filter(q=>q.dataset.done),right=done.filter(q=>q.dataset.correct==="true").length;
+    $("#score").innerHTML=`${right} / ${done.length}<small>answered ${done.length} of ${qs.length}</small>`;
+    const box=$("#done");if(done.length===qs.length){box.hidden=false;
+      box.innerHTML=`<b>${right} of ${qs.length}.</b> `+(right>=11?"You're ready. Run the recommendation in step 09 out loud once more and get some sleep.":right>=8?"Solid. Re-read the explanations you missed, then run steps 04 and 09 out loud.":"Go back to the primer in step 01, then retake the test. The terms will stick on the second pass.");}
+    else box.hidden=true;}
+  $("#resetTest").addEventListener("click",()=>{$$('.mc[data-group="test"]').forEach(resetMC);score();$("#test").scrollIntoView();});
+  score();
+
+  /* ---------- read aloud, with a voice menu ---------- */
+  const synth=window.speechSynthesis,rateSel=$("#rate"),vSel=$("#voicePick");
+  try{const r=localStorage.getItem(PAGEKEY+"-rate");if(r)rateSel.value=r;}catch(e){}
+  rateSel.addEventListener("change",()=>{try{localStorage.setItem(PAGEKEY+"-rate",rateSel.value);}catch(e){}});
+  let speakingBtn=null,voice=null,voices=[];
+  const vrank=v=>(/natural|neural/i.test(v.name)?0:/premium/i.test(v.name)?1:/enhanced/i.test(v.name)?2:/google/i.test(v.name)?3:4)+(/^en[-_]US/i.test(v.lang)?0:.5);
+  function loadVoices(){
+    if(!synth)return;
+    voices=synth.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>vrank(a)-vrank(b)||a.name.localeCompare(b.name));
+    if(!vSel)return;
+    let saved=null;try{saved=localStorage.getItem(PAGEKEY+"-voice");}catch(e){}
+    vSel.innerHTML=voices.length?voices.map((v,i)=>`<option value="${i}">${v.name.replace(/[<>&"]/g,"")}${vrank(v)<2?" (natural)":""}</option>`).join(""):'<option value="">Browser default</option>';
+    let idx=voices.findIndex(v=>v.name===saved);if(idx<0)idx=0;
+    if(voices.length)vSel.value=String(idx);voice=voices[idx]||null;
+  }
+  if(vSel)vSel.addEventListener("change",()=>{voice=voices[+vSel.value]||null;try{localStorage.setItem(PAGEKEY+"-voice",voice?voice.name:"");}catch(e){}});
+  loadVoices();
+  if(synth&&"onvoiceschanged" in synth)synth.addEventListener("voiceschanged",loadVoices);
+  function textOf(el){return(el.getAttribute("data-say")||el.innerText||"").replace(/\s+/g," ").trim();}
+  function visible(el){return!!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);}
+  function stop(){if(synth)synth.cancel();if(speakingBtn){speakingBtn.textContent=speakingBtn.dataset.label;speakingBtn.setAttribute("aria-pressed","false");speakingBtn=null;}}
+  function speakChunks(btn,chunks){
+    if(!synth||!chunks.length)return;
+    if(speakingBtn===btn){stop();return;}
+    stop();
+    speakingBtn=btn;btn.dataset.label=btn.dataset.label||btn.textContent;btn.textContent="Stop";btn.setAttribute("aria-pressed","true");
+    chunks.forEach((c,i)=>{const u=new SpeechSynthesisUtterance(c);u.rate=+rateSel.value;if(voice){u.voice=voice;u.lang=voice.lang;}else u.lang="en-US";
+      if(i===chunks.length-1)u.onend=()=>{if(speakingBtn===btn)stop();};synth.speak(u);});
+  }
+  function speak(btn,els){const chunks=[];els.filter(visible).forEach(el=>{textOf(el).split(/(?<=[.?!])\s+(?=[A-Z0-9"“])/).forEach(c=>{if(c)chunks.push(c);});});speakChunks(btn,chunks);}
+  if(!synth){$$(".listen,.qlisten").forEach(b=>b.hidden=true);$(".speed").hidden=true;const vb=$(".voicebar");if(vb)vb.hidden=true;}
+  else{
+    $$(".listen").forEach(b=>{b.dataset.label=b.textContent;b.addEventListener("click",()=>{const sec=b.closest("section");speak(b,$$("[data-say]",sec).filter(el=>!el.parentElement.closest("[data-say]")));});});
+    document.addEventListener("click",e=>{const b=e.target.closest(".qlisten");if(!b)return;const mc=b.closest(".mc");speak(b,$$("[data-say]",mc).filter(el=>!el.parentElement.closest("[data-say]")));});
+    const vt=$("#voiceTest");if(vt){vt.dataset.label=vt.textContent;vt.addEventListener("click",()=>speakChunks(vt,["Hi. This is how I'll read your case.","Pick another voice if this one sounds robotic."]));}
+  }
+  /* ---------- rail highlight ---------- */
+  const chips=$$("#chips a"),map=new Map(chips.map(a=>[a.getAttribute("href").slice(1),a]));
+  if("IntersectionObserver" in window){
+    const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){chips.forEach(c=>c.classList.remove("on"));const a=map.get(en.target.id);if(a){a.classList.add("on");const p=a.parentElement;p.scrollTo({left:a.offsetLeft-p.clientWidth/2+a.offsetWidth/2,behavior:"smooth"});}}});},{rootMargin:"-45% 0px -50% 0px"});
+    $$("section.step").forEach(s=>io.observe(s));
+  }
+})();
+</script>
+<script src="tts.js"></script>
+<script src="chat.js"></script>
+</body></html>
